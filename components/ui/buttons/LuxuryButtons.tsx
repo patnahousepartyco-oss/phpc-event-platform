@@ -1,4 +1,24 @@
 interface Props {
+
+  children: React.ReactNode;
+
+  onClick?: () => void;
+
+  disabled?: boolean;
+
+  variant?: "primary" | "secondary";
+}
+
+export default function LuxuryButton({
+
+  children,
+
+  onClick,
+
+  disabled = false,
+
+  variant = "primary",
+
 }: Props) {
 
   return (
@@ -14,10 +34,13 @@ interface Props {
         px-6
         py-3
         rounded-[18px]
+
         font-semibold
+
         transition-all
 
         ${
+
           variant === "primary"
 
             ?
@@ -27,9 +50,11 @@ interface Props {
             :
 
             "bg-white border border-[#E8D8C7] text-[#5C0A18]"
+
         }
 
         ${
+
           disabled
 
             ?
@@ -39,11 +64,16 @@ interface Props {
             :
 
             "hover:scale-[1.02]"
+
         }
+
       `}
 
     >
+
       {children}
+
     </button>
+
   );
 }

@@ -18,9 +18,7 @@ ONBOARDING STORE
 */
 
 import {
-
   useOnboardingStore,
-
 } from "@/state/onboarding/onboardingStore";
 
 /*
@@ -30,14 +28,12 @@ API
 */
 
 import {
-
   fetchMasterData,
-
 } from "@/services/api";
 
 /*
 ========================================
-BOOKING STORE
+BOOKING STORE ACTIONS
 ========================================
 */
 
@@ -55,14 +51,12 @@ import {
 
 /*
 ========================================
-BOOKING STORE STATE
+BOOKING STORE
 ========================================
 */
 
 import {
-
   useBookingStore,
-
 } from "@/state/booking/bookingStore";
 
 /*
@@ -72,7 +66,7 @@ WORKSPACE
 */
 
 import BookingWorkspace
-  from "./BookingWorkspace";
+from "./BookingWorkspace";
 
 /*
 ========================================
@@ -101,33 +95,24 @@ export default function BookingPage() {
     useSearchParams();
 
   const packageId =
-    searchParams.get(
-      "packageId"
-    );
+    searchParams.get("packageId") || "";
 
   const guestCount =
     Number(
-
-      searchParams.get(
-        "guestCount"
-      ) || 0
-
+      searchParams.get("guestCount") || 0
     );
 
   const basePlan =
     Number(
-
-      searchParams.get(
-        "basePlan"
-      ) || 0
-
+      searchParams.get("basePlan") || 0
     );
 
   const foodPreference =
-
+  (
     searchParams.get(
       "foodPreference"
-    ) || "Veg";
+    ) || "Veg"
+  ) as "Veg" | "Non Veg";
 
   /*
   ========================================
@@ -136,9 +121,7 @@ export default function BookingPage() {
   */
 
   const {
-
     eventContext,
-
   } = useOnboardingStore();
 
   /*
@@ -148,33 +131,9 @@ export default function BookingPage() {
   */
 
   const {
-
     selectedPackage:
       persistedPackage,
-
   } = useBookingStore();
-
-  /*
-  ========================================
-  PROTECT ROUTE
-  ========================================
-  */
-
-  useEffect(() => {
-
-    if (!eventContext) {
-
-      router.push("/");
-
-    }
-
-  }, [
-
-    eventContext,
-
-    router,
-
-  ]);
 
   /*
   ========================================
@@ -201,102 +160,82 @@ export default function BookingPage() {
   */
 
   const [
-
     packages,
-
-    setPackages
-
+    setPackages,
   ] = useState<any[]>([]);
 
   const [
-
     plans,
-
-    setPlans
-
+    setPlans,
   ] = useState<any[]>([]);
 
   const [
-
     menuItems,
-
-    setMenuItems
-
+    setMenuItems,
   ] = useState<any[]>([]);
 
   const [
-
     foodAddons,
-
-    setFoodAddons
-
+    setFoodAddons,
   ] = useState<any[]>([]);
 
   const [
-
     addonMappings,
-
-    setAddonMappings
-
+    setAddonMappings,
   ] = useState<any[]>([]);
 
   const [
-
     serviceAddons,
-
-    setServiceAddons
-
+    setServiceAddons,
   ] = useState<any[]>([]);
 
   const [
-
     combos,
-
-    setCombos
-
+    setCombos,
   ] = useState<any[]>([]);
 
   /*
   ========================================
-  ACTIVE PACKAGE
+  LOCAL STATE
   ========================================
   */
 
   const [
-
     selectedPackage,
-
-    setSelectedPackageState
-
+    setSelectedPackageState,
   ] = useState<any>(null);
 
-  /*
-  ========================================
-  MENU STATE
-  ========================================
-  */
-
   const [
-
     selectedMenuItems,
-
-    setSelectedMenuItems
-
+    setSelectedMenuItems,
   ] = useState<any>({});
 
+  const [
+    isLoading,
+    setIsLoading,
+  ] = useState(true);
+
   /*
   ========================================
-  LOADING
+  ROUTE PROTECTION
   ========================================
   */
 
-  const [
+  useEffect(() => {
 
-    isLoading,
+    if (!eventContext) {
 
-    setIsLoading
+      router.push("/");
 
-  ] = useState(true);
+    }
+
+  }, [
+
+    eventContext,
+
+    router,
+
+  ]);
 
   /*
   ========================================
@@ -306,30 +245,24 @@ export default function BookingPage() {
 
   useEffect(() => {
 
+    if (!eventContext) {
+
+      return;
+
+    }
+
     async function loadData() {
 
       try {
 
-        /*
-        ====================================
-        START LOADING
-        ====================================
-        */
-
         setIsLoading(true);
-
-        /*
-        ====================================
-        MASTER FETCH
-        ====================================
-        */
 
         const masterData =
           await fetchMasterData();
 
         /*
         ====================================
-        EXTRACT DATASETS
+        DATASETS
         ====================================
         */
 
@@ -356,49 +289,41 @@ export default function BookingPage() {
 
         /*
         ====================================
-        STORE RAW DATA
+        STORE DATA
         ====================================
         */
 
-        setPackages(
-          packagesData
-        );
+        setPackages(packagesData);
 
-        setPlans(
-          plansData
-        );
+        setPlans(plansData);
 
-        setMenuItems(
-          menuData
-        );
+        setMenuItems(menuData);
 
-        setFoodAddons(
-          foodAddonData
-        );
+        setFoodAddons(foodAddonData);
 
-        setAddonMappings(
-          addonMappingData
-        );
+        setAddonMappings(addonMappingData);
 
-        setServiceAddons(
-          serviceAddonData
-        );
+        setServiceAddons(serviceAddonData);
 
-        setCombos(
-          comboData
-        );
+        setCombos(comboData);
 
         /*
         ====================================
-        SESSION CONTINUITY
+        UPDATE STORE
         ====================================
+        */
 
-        DO NOT REINITIALIZE IF:
+        updateGuestCount(
+          guestCount
+        );
 
-        - Same package
-        - Same persisted session
-        - User navigated back
+        setFoodPreference(
+  foodPreference as any
+);
 
+        /*
+        ====================================
+        SESSION REUSE
         ====================================
         */
 
@@ -408,61 +333,22 @@ export default function BookingPage() {
 
           String(
             persistedPackage?.packageId
-          )
+          ) === String(packageId);
 
-          ===
+        if (isSameSession) {
 
-          String(packageId);
+          setSelectedPackageState(
+            persistedPackage
+          );
 
-        /*
-        ====================================
-        REUSE SESSION
-        ====================================
-        */
+          calculateTotals();
 
-       if (isSameSession) {
-
-  /*
-  ==================================
-  REUSE PERSISTED PACKAGE
-  ==================================
-  */
-
-  setSelectedPackageState(
-    persistedPackage
-  );
-
-  /*
-  ==================================
-  RESTORE RUNTIME
-  ==================================
-  */
-
-  updateGuestCount(
-    guestCount
-  );
-
-  setFoodPreference(
-    foodPreference
-  );
-
-  /*
-  ==================================
-  RECALCULATE
-  ==================================
-  */
-
-  setTimeout(() => {
-
-    calculateTotals();
-
-  }, 0);
-
-}
+          return;
+        }
 
         /*
         ====================================
-        MATCH PACKAGE
+        FIND PACKAGE
         ====================================
         */
 
@@ -474,257 +360,160 @@ export default function BookingPage() {
 
               String(
                 pkg.package_id
-              )
-
-              ===
-
-              String(
-                packageId
-              )
+              ) === String(packageId)
 
           );
 
-        /*
-        ====================================
-        INITIALIZE STORE
-        ====================================
-        */
+        if (!matchedPackage) {
 
-        if (matchedPackage) {
+          return;
 
-          /*
-          ==================================
-          MATCH PLAN
-          ==================================
-          */
-
-          const matchedPlan =
-
-            plansData.find(
-
-              (plan: any) =>
-
-                String(
-                  plan.package_id
-                )
-
-                ===
-
-                String(
-                  packageId
-                )
-
-                &&
-
-                Number(
-                  plan.included_pax
-                )
-
-                ===
-
-                Number(
-                  basePlan
-                )
-
-                &&
-
-                String(
-                  plan.food_type
-                ).toLowerCase()
-
-                ===
-
-                String(
-                  foodPreference
-                ).toLowerCase()
-
-            );
-
-          /*
-          ==================================
-          FALLBACK PLAN
-          ==================================
-          */
-
-          const fallbackPlan =
-
-            plansData.find(
-
-              (plan: any) =>
-
-                String(
-                  plan.package_id
-                )
-
-                ===
-
-                String(
-                  packageId
-                )
-
-            );
-
-          /*
-          ==================================
-          FINAL PLAN
-          ==================================
-          */
-
-          const finalPlan =
-
-            matchedPlan ||
-
-            fallbackPlan;
-
-          /*
-          ==================================
-          PACKAGE OBJECT
-          ==================================
-          */
-
-          const packageObject = {
-
-            ...matchedPackage,
-
-            planId:
-
-              finalPlan?.plan_id ||
-
-              "",
-
-            packageId:
-
-              matchedPackage?.package_id ||
-
-              "",
-
-            name:
-
-              matchedPackage.package_name ||
-
-              matchedPackage.name ||
-
-              "",
-
-            description:
-
-              matchedPackage.description ||
-
-              "",
-
-            includedGuests:
-              Number(
-                basePlan
-              ),
-
-            basePrice:
-
-              Number(
-
-                finalPlan?.selling_price ||
-
-                0
-
-              ),
-
-            additionalPlateCost:
-
-              Number(
-
-                finalPlan?.extra_plate_price ||
-
-                0
-
-              ),
-
-            foodType:
-
-              finalPlan?.food_type ||
-
-              foodPreference,
-
-          };
-
-          /*
-          ==================================
-          STORE
-          ==================================
-          */
-
-          setSelectedPackage(
-            packageObject
-          );
-
-          setSelectedPackageState(
-            packageObject
-          );
         }
 
         /*
         ====================================
-        GUESTS
+        FIND PLAN
         ====================================
         */
 
-        updateGuestCount(
-          guestCount
-        );
+        const matchedPlan =
+
+          plansData.find(
+
+            (plan: any) =>
+
+              String(
+                plan.package_id
+              ) === String(packageId)
+
+              &&
+
+              Number(
+                plan.included_pax
+              ) === Number(basePlan)
+
+              &&
+
+              String(
+                plan.food_type
+              ).toLowerCase()
+
+              ===
+
+              String(
+                foodPreference
+              ).toLowerCase()
+
+          );
+
+        const fallbackPlan =
+
+          plansData.find(
+
+            (plan: any) =>
+
+              String(
+                plan.package_id
+              ) === String(packageId)
+
+          );
+
+        const finalPlan =
+          matchedPlan ||
+          fallbackPlan;
 
         /*
         ====================================
-        FOOD PREF
+        NORMALIZED PACKAGE
         ====================================
         */
 
-        setFoodPreference(
-          foodPreference
-        );
+        const packageObject = {
+
+          ...matchedPackage,
+
+          packageId:
+
+            matchedPackage.package_id ||
+
+            "",
+
+          planId:
+
+            finalPlan?.plan_id ||
+
+            "",
+
+          name:
+
+            matchedPackage.package_name ||
+
+            matchedPackage.name ||
+
+            "Package",
+
+          description:
+
+            matchedPackage.description ||
+
+            "",
+
+          includedGuests:
+
+            Number(basePlan),
+
+          basePrice:
+
+            Number(
+              finalPlan?.selling_price || 0
+            ),
+
+          additionalPlateCost:
+
+            Number(
+              finalPlan?.extra_plate_price || 0
+            ),
+
+          foodType:
+
+            finalPlan?.food_type ||
+
+            foodPreference,
+
+        };
 
         /*
         ====================================
-        RECALCULATE
+        STORE PACKAGE
         ====================================
         */
 
-        setTimeout(() => {
+        setSelectedPackage(
+          packageObject
+        );
 
-          calculateTotals();
+        setSelectedPackageState(
+          packageObject
+        );
 
-        }, 0);
+        calculateTotals();
 
       } catch (error) {
 
         console.error(
-
-          "Booking page load error:",
-
+          "Booking load error:",
           error
-
         );
 
       } finally {
 
-        /*
-        ====================================
-        COMPLETE LOADING
-        ====================================
-        */
-
         setIsLoading(false);
+
       }
-    }
-
-    /*
-    ======================================
-    ONLY LOAD IF CONTEXT EXISTS
-    ======================================
-    */
-
-    if (eventContext) {
-
-      loadData();
 
     }
+
+    loadData();
 
   }, [
 
@@ -738,13 +527,7 @@ export default function BookingPage() {
 
     eventContext,
 
-    setSelectedPackage,
-
-    updateGuestCount,
-
-    setFoodPreference,
-
-    calculateTotals,
+    persistedPackage,
 
   ]);
 
@@ -761,15 +544,11 @@ export default function BookingPage() {
 
         (item: any) =>
 
-          String(
-            item.package_id
-          )
+          String(item.package_id)
 
           ===
 
-          String(
-            packageId
-          )
+          String(packageId)
 
       );
 
@@ -824,25 +603,22 @@ export default function BookingPage() {
 
   /*
   ========================================
-  HYDRATED RUNTIME CONTEXT
+  RUNTIME CONTEXT
   ========================================
   */
 
   const runtimeContext =
     useMemo(() => {
 
-      if (!eventContext)
+      if (!eventContext) {
+
         return null;
+
+      }
 
       return {
 
         ...eventContext,
-
-        /*
-        ==================================
-        RAW DATASETS
-        ==================================
-        */
 
         packages,
 
@@ -855,12 +631,6 @@ export default function BookingPage() {
         serviceAddons,
 
         combos,
-
-        /*
-        ==================================
-        ACTIVE RUNTIME
-        ==================================
-        */
 
         selectedPackage,
 
@@ -910,7 +680,7 @@ export default function BookingPage() {
 
   /*
   ========================================
-  LOADING STATE
+  LOADING UI
   ========================================
   */
 
@@ -941,6 +711,7 @@ export default function BookingPage() {
       </div>
 
     );
+
   }
 
   /*
@@ -992,4 +763,5 @@ export default function BookingPage() {
     />
 
   );
+
 }

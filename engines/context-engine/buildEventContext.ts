@@ -94,7 +94,13 @@ export function buildEventContext({
 
 }: any): BookingRuntimeContext {
 
-  return {
+  /*
+  ========================================
+  NORMALIZED CONTEXT
+  ========================================
+  */
+
+  const context: BookingRuntimeContext = {
 
     /*
     ======================================
@@ -194,11 +200,15 @@ export function buildEventContext({
 
         recommendedPackage?.package_id ||
 
+        recommendedPackage?.packageId ||
+
         null,
 
       recommended_package_name:
 
         recommendedPackage?.package_name ||
+
+        recommendedPackage?.name ||
 
         null,
 
@@ -210,17 +220,53 @@ export function buildEventContext({
     ======================================
     */
 
-    packages,
+    packages:
 
-    plans,
+      Array.isArray(packages)
 
-    foodAddons,
+        ? packages
 
-    addonMappings,
+        : [],
 
-    serviceAddons,
+    plans:
 
-    combos,
+      Array.isArray(plans)
+
+        ? plans
+
+        : [],
+
+    foodAddons:
+
+      Array.isArray(foodAddons)
+
+        ? foodAddons
+
+        : [],
+
+    addonMappings:
+
+      Array.isArray(addonMappings)
+
+        ? addonMappings
+
+        : [],
+
+    serviceAddons:
+
+      Array.isArray(serviceAddons)
+
+        ? serviceAddons
+
+        : [],
+
+    combos:
+
+      Array.isArray(combos)
+
+        ? combos
+
+        : [],
 
     /*
     ======================================
@@ -228,11 +274,26 @@ export function buildEventContext({
     ======================================
     */
 
-    selectedPackage,
+    selectedPackage:
 
-    selectedPlan,
+      selectedPackage || null,
 
-    pricing,
+    selectedPlan:
+
+      selectedPlan || null,
+
+    pricing:
+
+      pricing || null,
 
   };
+
+  /*
+  ========================================
+  RETURN
+  ========================================
+  */
+
+  return context;
+
 }

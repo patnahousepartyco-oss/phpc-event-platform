@@ -1,19 +1,33 @@
-// state/booking/bookingStore.ts
+"use client";
+
+/*
+========================================
+ZUSTAND
+========================================
+*/
 
 import { create } from "zustand";
 
 import { persist } from "zustand/middleware";
 
+/*
+========================================
+TYPES
+========================================
+*/
+
 import {
-
   BookingState,
-
 } from "./bookingTypes";
 
+/*
+========================================
+PRICING ENGINE
+========================================
+*/
+
 import {
-
   calculateBookingTotals,
-
 } from "@/engines/pricing-engine/calculateBookingTotals";
 
 /*
@@ -67,158 +81,77 @@ export const useBookingStore =
           taxAmount: 0,
 
           grandTotal: 0,
+
         },
 
         /*
         ========================================
-        PACKAGE
+        SET PACKAGE
         ========================================
         */
 
-        setSelectedPackage: (
-          pkg
-        ) =>
+        setSelectedPackage: (pkg: any) =>
 
           set((state) => {
 
-            /*
-            ====================================
-            NORMALIZED PACKAGE
-            ====================================
-            */
+          const normalizedPackage = {
 
-            const normalizedPackage = {
+  ...pkg,
 
-              ...pkg,
+  planId:
+    pkg?.planId ||
+    pkg?.plan_id ||
+    "",
 
-              /*
-              ==================================
-              IDS
-              ==================================
-              */
+  packageId:
+    pkg?.packageId ||
+    pkg?.package_id ||
+    "",
 
-              planId:
+  name:
+    pkg?.name ||
+    pkg?.package_name ||
+    "Package",
 
-                pkg?.planId ||
+  description:
+    pkg?.description ||
+    pkg?.package_description ||
+    "",
 
-                pkg?.plan_id ||
+  basePrice:
+    Number(
+      pkg?.basePrice ||
+      pkg?.selling_price ||
+      pkg?.base_price ||
+      pkg?.package_price ||
+      0
+    ),
 
-                "",
+  includedGuests:
+    Number(
+      pkg?.includedGuests ||
+      pkg?.included_guests ||
+      0
+    ),
 
-              packageId:
+  additionalPlateCost:
+    Number(
+      pkg?.additionalPlateCost ||
+      pkg?.additional_plate_cost ||
+      pkg?.extra_plate_price ||
+      0
+    ),
 
-                pkg?.packageId ||
+  foodType:
+    pkg?.foodType ||
+    pkg?.food_type ||
+    "Veg",
 
-                pkg?.package_id ||
-
-                "",
-
-              /*
-              ==================================
-              NAME
-              ==================================
-              */
-
-              name:
-
-                pkg?.name ||
-
-                pkg?.package_name ||
-
-                "Package",
-
-              /*
-              ==================================
-              DESCRIPTION
-              ==================================
-              */
-
-              description:
-
-                pkg?.description ||
-
-                pkg?.package_description ||
-
-                "",
-
-              /*
-              ==================================
-              BASE PRICE
-              ==================================
-              */
-
-              basePrice:
-
-                Number(
-
-                  pkg?.basePrice ||
-
-                  pkg?.selling_price ||
-
-                  pkg?.base_price ||
-
-                  pkg?.package_price ||
-
-                  0
-
-                ),
-
-              /*
-              ==================================
-              INCLUDED GUESTS
-              ==================================
-              */
-
-              includedGuests:
-
-                Number(
-
-                  pkg?.includedGuests ||
-
-                  pkg?.included_guests ||
-
-                  0
-
-                ),
-
-              /*
-              ==================================
-              EXTRA GUEST PRICE
-              ==================================
-              */
-
-              additionalPlateCost:
-
-                Number(
-
-                  pkg?.additionalPlateCost ||
-
-                  pkg?.additional_plate_cost ||
-
-                  pkg?.extra_plate_price ||
-
-                  0
-
-                ),
-
-              /*
-              ==================================
-              FOOD TYPE
-              ==================================
-              */
-
-              foodType:
-
-                pkg?.foodType ||
-
-                pkg?.food_type ||
-
-                "Veg",
-            };
+};
 
             /*
             ====================================
-            EXISTING ADDONS
+            ADDON FILTERS
             ====================================
             */
 
@@ -228,8 +161,7 @@ export const useBookingStore =
 
                 (addon: any) =>
 
-                  addon.category ===
-                  "food"
+                  addon.category === "food"
 
               );
 
@@ -239,8 +171,7 @@ export const useBookingStore =
 
                 (addon: any) =>
 
-                  addon.category ===
-                  "combo"
+                  addon.category === "combo"
 
               );
 
@@ -250,8 +181,7 @@ export const useBookingStore =
 
                 (addon: any) =>
 
-                  addon.category ===
-                  "service"
+                  addon.category === "service"
 
               );
 
@@ -276,6 +206,7 @@ export const useBookingStore =
 
                 guestCount:
                   state.guestCount,
+
               });
 
             return {
@@ -284,7 +215,9 @@ export const useBookingStore =
                 normalizedPackage,
 
               pricing,
+
             };
+
           }),
 
         /*
@@ -293,17 +226,9 @@ export const useBookingStore =
         ========================================
         */
 
-        addAddon: (
-          addon
-        ) =>
+        addAddon: (addon) =>
 
           set((state) => {
-
-            /*
-            ====================================
-            EXISTING
-            ====================================
-            */
 
             const existingAddon =
 
@@ -315,8 +240,7 @@ export const useBookingStore =
 
               );
 
-            let updatedAddons =
-              [];
+            let updatedAddons = [];
 
             /*
             ====================================
@@ -353,10 +277,13 @@ export const useBookingStore =
                           quantity *
 
                           a.unitPrice,
+
                       };
+
                     }
 
                     return a;
+
                   }
 
                 );
@@ -376,7 +303,9 @@ export const useBookingStore =
                 ...state.addons,
 
                 addon,
+
               ];
+
             }
 
             /*
@@ -391,8 +320,7 @@ export const useBookingStore =
 
                 (addon: any) =>
 
-                  addon.category ===
-                  "food"
+                  addon.category === "food"
 
               );
 
@@ -402,8 +330,7 @@ export const useBookingStore =
 
                 (addon: any) =>
 
-                  addon.category ===
-                  "combo"
+                  addon.category === "combo"
 
               );
 
@@ -413,8 +340,7 @@ export const useBookingStore =
 
                 (addon: any) =>
 
-                  addon.category ===
-                  "service"
+                  addon.category === "service"
 
               );
 
@@ -439,6 +365,7 @@ export const useBookingStore =
 
                 guestCount:
                   state.guestCount,
+
               });
 
             return {
@@ -447,7 +374,9 @@ export const useBookingStore =
                 updatedAddons,
 
               pricing,
+
             };
+
           }),
 
         /*
@@ -456,9 +385,7 @@ export const useBookingStore =
         ========================================
         */
 
-        removeAddon: (
-          addonId
-        ) =>
+        removeAddon: (addonId) =>
 
           set((state) => {
 
@@ -478,8 +405,7 @@ export const useBookingStore =
 
                 (addon: any) =>
 
-                  addon.category ===
-                  "food"
+                  addon.category === "food"
 
               );
 
@@ -489,8 +415,7 @@ export const useBookingStore =
 
                 (addon: any) =>
 
-                  addon.category ===
-                  "combo"
+                  addon.category === "combo"
 
               );
 
@@ -500,8 +425,7 @@ export const useBookingStore =
 
                 (addon: any) =>
 
-                  addon.category ===
-                  "service"
+                  addon.category === "service"
 
               );
 
@@ -520,6 +444,7 @@ export const useBookingStore =
 
                 guestCount:
                   state.guestCount,
+
               });
 
             return {
@@ -528,112 +453,116 @@ export const useBookingStore =
                 updatedAddons,
 
               pricing,
+
             };
+
           }),
 
         /*
         ========================================
-        UPDATE ADDON QUANTITY
+        UPDATE QUANTITY
         ========================================
         */
 
-        updateAddonQuantity: (
+        updateAddonQuantity:
 
-          addonId,
+          (
+            addonId,
+            quantity
+          ) =>
 
-          quantity
+            set((state) => {
 
-        ) =>
+              const updatedAddons =
 
-          set((state) => {
+                state.addons.map(
 
-            const updatedAddons =
+                  (addon: any) => {
 
-              state.addons.map(
+                    if (
+                      addon.id === addonId
+                    ) {
 
-                (addon: any) => {
+                      return {
 
-                  if (
-                    addon.id === addonId
-                  ) {
+                        ...addon,
 
-                    return {
+                        quantity,
 
-                      ...addon,
+                        totalPrice:
 
-                      quantity,
+                          quantity *
 
-                      totalPrice:
+                          addon.unitPrice,
 
-                        quantity *
+                      };
 
-                        addon.unitPrice,
-                    };
+                    }
+
+                    return addon;
+
                   }
 
-                  return addon;
-                }
+                );
 
-              );
+              const foodAddons =
 
-            const foodAddons =
+                updatedAddons.filter(
 
-              updatedAddons.filter(
+                  (addon: any) =>
 
-                (addon: any) =>
+                    addon.category === "food"
 
-                  addon.category ===
-                  "food"
+                );
 
-              );
+              const comboAddons =
 
-            const comboAddons =
+                updatedAddons.filter(
 
-              updatedAddons.filter(
+                  (addon: any) =>
 
-                (addon: any) =>
+                    addon.category === "combo"
 
-                  addon.category ===
-                  "combo"
+                );
 
-              );
+              const serviceAddons =
 
-            const serviceAddons =
+                updatedAddons.filter(
 
-              updatedAddons.filter(
+                  (addon: any) =>
 
-                (addon: any) =>
+                    addon.category === "service"
 
-                  addon.category ===
-                  "service"
+                );
 
-              );
+              const pricing =
 
-            const pricing =
+                calculateBookingTotals({
 
-              calculateBookingTotals({
+                  selectedPackage:
+                    state.selectedPackage,
 
-                selectedPackage:
-                  state.selectedPackage,
+                  foodAddons,
 
-                foodAddons,
+                  comboAddons,
 
-                comboAddons,
+                  serviceAddons,
 
-                serviceAddons,
+                  guestCount:
+                    state.guestCount,
 
-                guestCount:
-                  state.guestCount,
-              });
+                });
 
-            return {
+              return {
 
-              addons:
-                updatedAddons,
+                addons:
+                  updatedAddons,
 
-              pricing,
-            };
-          }),
+                pricing,
+
+              };
+
+            }),
 
         /*
         ========================================
@@ -641,9 +570,7 @@ export const useBookingStore =
         ========================================
         */
 
-        updateGuestCount: (
-          count
-        ) =>
+        updateGuestCount: (count) =>
 
           set((state) => {
 
@@ -653,8 +580,7 @@ export const useBookingStore =
 
                 (addon: any) =>
 
-                  addon.category ===
-                  "food"
+                  addon.category === "food"
 
               );
 
@@ -664,8 +590,7 @@ export const useBookingStore =
 
                 (addon: any) =>
 
-                  addon.category ===
-                  "combo"
+                  addon.category === "combo"
 
               );
 
@@ -675,8 +600,7 @@ export const useBookingStore =
 
                 (addon: any) =>
 
-                  addon.category ===
-                  "service"
+                  addon.category === "service"
 
               );
 
@@ -695,6 +619,7 @@ export const useBookingStore =
 
                 guestCount:
                   count,
+
               });
 
             return {
@@ -702,7 +627,9 @@ export const useBookingStore =
               guestCount: count,
 
               pricing,
+
             };
+
           }),
 
         /*
@@ -711,15 +638,16 @@ export const useBookingStore =
         ========================================
         */
 
-        setFoodPreference: (
-          preference
-        ) =>
+        setFoodPreference:
 
-          set({
+          (preference) =>
 
-            foodPreference:
-              preference,
-          }),
+            set({
+
+              foodPreference:
+                preference,
+
+            }),
 
         /*
         ========================================
@@ -727,17 +655,19 @@ export const useBookingStore =
         ========================================
         */
 
-        setEventDetails: (
-          details
-        ) =>
+        setEventDetails:
 
-          set({
-            ...details,
-          }),
+          (details) =>
+
+            set({
+
+              ...details,
+
+            }),
 
         /*
         ========================================
-        CALCULATE TOTALS
+        RECALCULATE
         ========================================
         */
 
@@ -751,8 +681,7 @@ export const useBookingStore =
 
                 (addon: any) =>
 
-                  addon.category ===
-                  "food"
+                  addon.category === "food"
 
               );
 
@@ -762,8 +691,7 @@ export const useBookingStore =
 
                 (addon: any) =>
 
-                  addon.category ===
-                  "combo"
+                  addon.category === "combo"
 
               );
 
@@ -773,8 +701,7 @@ export const useBookingStore =
 
                 (addon: any) =>
 
-                  addon.category ===
-                  "service"
+                  addon.category === "service"
 
               );
 
@@ -793,11 +720,15 @@ export const useBookingStore =
 
                 guestCount:
                   state.guestCount,
+
               });
 
             return {
+
               pricing,
+
             };
+
           }),
 
         /*
@@ -816,8 +747,7 @@ export const useBookingStore =
 
             guestCount: 0,
 
-            foodPreference:
-              "veg",
+            foodPreference: "veg",
 
             eventDate: undefined,
 
@@ -842,8 +772,11 @@ export const useBookingStore =
               taxAmount: 0,
 
               grandTotal: 0,
+
             },
+
           }),
+
       }),
 
       /*
@@ -853,14 +786,9 @@ export const useBookingStore =
       */
 
       {
+
         name:
           "phpc-booking-session",
-
-        /*
-        ====================================
-        PERSIST ONLY RUNTIME STATE
-        ====================================
-        */
 
         partialize: (state) => ({
 
@@ -887,7 +815,9 @@ export const useBookingStore =
 
           venue:
             state.venue,
+
         }),
+
       }
 
     )

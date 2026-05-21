@@ -60,6 +60,8 @@ interface Props {
   serviceAddons?: any[];
 
   addonMappings?: any[];
+
+  operationalContext: any;
 }
 
 /*

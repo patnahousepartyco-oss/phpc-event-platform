@@ -8,11 +8,31 @@ LEAD CONTEXT
 
 export interface LeadContext {
 
+  /*
+  ========================================
+  PERSISTENT CRM IDS
+  ========================================
+  */
+
+  customer_id: string;
+
   lead_id: string;
+
+  /*
+  ========================================
+  CUSTOMER
+  ========================================
+  */
 
   customer_name: string;
 
   customer_mobile: string;
+
+  /*
+  ========================================
+  TIMESTAMP
+  ========================================
+  */
 
   created_at: string;
 }
@@ -120,7 +140,7 @@ export interface BookingRuntimeContext {
 
   /*
   ========================================
-  RUNTIME
+  ACTIVE RUNTIME
   ========================================
   */
 

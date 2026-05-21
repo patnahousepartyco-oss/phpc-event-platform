@@ -56,12 +56,9 @@ interface Props {
   activeExtraGuests:
     number;
 
-  setSelectedBasePlan:
-    React.Dispatch<
-      React.SetStateAction<
-        number | null
-      >
-    >;
+  setSelectedBasePlan: (
+  value: number | null
+) => void;
 
   isUserSelected?: boolean;
 }

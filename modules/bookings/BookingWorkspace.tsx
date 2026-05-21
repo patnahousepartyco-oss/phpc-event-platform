@@ -11,34 +11,28 @@ import {
 } from "next/navigation";
 
 import BookingContainer
-  from "./layout/BookingContainer";
-
-import BookingSidebar
-  from "./layout/BookingSidebar";
+from "./layout/BookingContainer";
 
 import BookingHeader
-  from "./layout/BookingHeader";
+from "./layout/BookingHeader";
 
 import PackageHero
-  from "./sections/PackageHero";
+from "./sections/PackageHero";
 
 import PackageOverview
-  from "./sections/PackageOverview";
+from "./sections/PackageOverview";
 
 import PackageMenu
-  from "./sections/PackageMenu";
+from "./sections/PackageMenu";
 
 import FoodAddons
-  from "./sections/FoodAddons";
+from "./sections/FoodAddons";
 
 import ServiceAddons
-  from "./sections/ServiceAddons";
+from "./sections/ServiceAddons";
 
 import ComboAddons
-  from "./sections/ComboAddons";
-
-import PricingSummary
-  from "./summary/PricingSummary";
+from "./sections/ComboAddons";
 
 /*
 ========================================
@@ -82,6 +76,8 @@ interface Props {
 
   operationalContext: any;
 
+  runtimeContext: any;
+
   serviceAddons: any[];
 
   combos: any[];
@@ -114,7 +110,7 @@ export default function BookingWorkspace({
 }: Props) {
 
   const router =
-  useRouter();
+    useRouter();
 
   /*
   ========================================
@@ -179,8 +175,8 @@ export default function BookingWorkspace({
   ========================================
   */
 
-  const selectedPackage =
-    useSelectedPackage();
+  const selectedPackage: any =
+  useSelectedPackage();
 
   const pricing =
     useBookingPricing();
@@ -199,7 +195,7 @@ export default function BookingWorkspace({
 
   /*
   ========================================
-  NORMALIZED PACKAGE VALUES
+  PACKAGE VALUES
   ========================================
   */
 
@@ -221,7 +217,7 @@ export default function BookingWorkspace({
 
   /*
   ========================================
-  BASE PRICE FIX
+  NORMALIZED TOTAL
   ========================================
   */
 
@@ -246,12 +242,6 @@ export default function BookingWorkspace({
         0
 
       );
-
-  /*
-  ========================================
-  LIVE GRAND TOTAL FIX
-  ========================================
-  */
 
   const normalizedGrandTotal =
 
@@ -306,6 +296,20 @@ export default function BookingWorkspace({
 
   /*
   ========================================
+  TOTAL SELECTED
+  ========================================
+  */
+
+  const totalSelections =
+
+    selectedFoodAddons.length +
+
+    selectedComboAddons.length +
+
+    selectedServiceAddons.length;
+
+  /*
+  ========================================
   RENDER
   ========================================
   */
@@ -334,17 +338,12 @@ export default function BookingWorkspace({
         className="
           grid
           grid-cols-1
-          xl:grid-cols-[1fr_420px]
           gap-6
           lg:gap-8
           mt-6
           lg:mt-10
         "
       >
-
-        {/* ========================================
-            LEFT PANEL
-        ======================================== */}
 
         <div className="space-y-5 lg:space-y-8">
 
@@ -364,21 +363,21 @@ export default function BookingWorkspace({
 
           <div ref={overviewRef}>
 
-           <PackageOverview
+            <PackageOverview
 
-  selectedPackage={
-    selectedPackage
-  }
+              selectedPackage={
+                selectedPackage
+              }
 
-  activeBasePlan={
-    operationalContext.activeBasePlan
-  }
+              activeBasePlan={
+                operationalContext.activeBasePlan
+              }
 
-  activeExtraGuests={
-    operationalContext.activeExtraGuests
-  }
+              activeExtraGuests={
+                operationalContext.activeExtraGuests
+              }
 
-/>
+            />
 
           </div>
 
@@ -478,174 +477,123 @@ export default function BookingWorkspace({
 
       </div>
 
-    <button
+      {/* ========================================
+          FLOATING SUMMARY CTA
+      ======================================== */}
 
-  onClick={() => {
+      <button
 
-    router.push(
-      "/bookings/summary"
-    );
+        onClick={() => {
 
-  }}
+          router.push(
+            "/bookings/summary"
+          );
 
-  className="
-    fixed
-    bottom-6
-    left-1/2
-    -translate-x-1/2
-    z-50
+        }}
 
-    w-[92%]
-    max-w-[520px]
+        className="
+          fixed
+          bottom-6
+          left-1/2
+          -translate-x-1/2
+          z-50
 
-    bg-[#5C0A18]/95
-    backdrop-blur-xl
+          w-[92%]
+          max-w-[520px]
 
-    text-white
+          bg-[#5C0A18]/95
+          backdrop-blur-xl
 
-    rounded-full
+          text-white
 
-    px-5
-    py-4
+          rounded-full
 
-    shadow-[0_12px_40px_rgba(0,0,0,0.22)]
+          px-5
+          py-4
 
-    border
-    border-white/10
+          shadow-[0_12px_40px_rgba(0,0,0,0.22)]
 
-    flex
-    items-center
-    justify-between
-    gap-4
-  "
+          border
+          border-white/10
 
->
+          flex
+          items-center
+          justify-between
+          gap-4
+        "
 
-  {/* ================================
-      LEFT
-  ================================= */}
+      >
 
-  <div>
+        {/* LEFT */}
 
-    <p className="text-[10px] uppercase tracking-[2px] text-white/60">
+        <div className="min-w-0 text-left">
 
-      Estimated Total
+          <p className="text-[9px] uppercase tracking-[2px] text-white/50">
 
-    </p>
+            Estimated Total
 
-    <p className="text-xl font-bold leading-none mt-1">
+          </p>
 
-      ₹{pricing.grandTotal}
+          <div className="flex items-center gap-2 mt-1">
 
-    </p>
+            <p className="text-lg font-bold leading-none truncate">
 
-  </div>
+              ₹
 
-  {/* ================================
-      RIGHT
-  ================================= */}
+              {
 
-  <div
+                Math.round(
+                  normalizedGrandTotal
+                ).toLocaleString("en-IN")
 
-    className="
-      bg-white
-      text-[#5C0A18]
+              }
 
-      px-5
-      py-3
+            </p>
 
-      rounded-full
+          </div>
 
-      text-xs
-      font-semibold
+          <p className="text-[10px] text-white/60 mt-1">
 
-      uppercase
-      tracking-[2px]
+            {totalSelections}
+            {" "}
+            selected
 
-      shrink-0
+          </p>
 
-      shadow-sm
-    "
+        </div>
 
-  >
+        {/* RIGHT */}
 
-    View Summary
+        <div
+          className="
+            shrink-0
 
-  </div>
+            bg-white
+            text-[#5C0A18]
 
-</button>
+            px-4
+            py-3
 
-  <div className="flex items-center justify-between gap-3">
+            rounded-full
 
-    {/* LEFT */}
+            text-[11px]
+            font-semibold
 
-    <div className="min-w-0 text-left">
+            uppercase
+            tracking-[2px]
 
-      <p className="text-[9px] uppercase tracking-[2px] text-white/50">
+            whitespace-nowrap
+          "
+        >
 
-        Total
+          View Summary
 
-      </p>
+        </div>
 
-      <div className="flex items-center gap-2 mt-1">
-
-        <p className="text-lg font-bold leading-none truncate">
-
-          ₹{normalizedGrandTotal}
-
-        </p>
-
-      </div>
-
-      <p className="text-[10px] text-white/60 mt-1">
-
-        {
-
-          selectedFoodAddons.length +
-
-          selectedComboAddons.length +
-
-          selectedServiceAddons.length
-
-        }
-
-        {" "}
-        selected
-
-      </p>
-
-    </div>
-
-    {/* RIGHT */}
-
-    <div
-      className="
-        shrink-0
-
-        bg-white
-        text-[#5C0A18]
-
-        px-3
-        py-2
-
-        rounded-full
-
-        text-[11px]
-        font-semibold
-        whitespace-nowrap
-      "
-    >
-
-      Summary
-
-    </div>
-
-  </div>
-
-
+      </button>
 
       {/* ========================================
-          MOBILE FLOATING MENU BUTTON
+          MOBILE FLOATING MENU
       ======================================== */}
 
       <button
@@ -657,17 +605,23 @@ export default function BookingWorkspace({
         className="
           xl:hidden
           fixed
-          bottom-5
+          bottom-24
           right-5
           z-50
+
           bg-[#6A0017]
           text-white
+
           px-5
           py-3
+
           rounded-full
+
           shadow-[0_10px_30px_rgba(0,0,0,0.25)]
+
           border
           border-white/10
+
           text-sm
           font-semibold
         "
@@ -679,7 +633,7 @@ export default function BookingWorkspace({
       </button>
 
       {/* ========================================
-          MOBILE BOTTOM SHEET
+          MOBILE MENU SHEET
       ======================================== */}
 
       {showMobileMenu && (
@@ -690,6 +644,7 @@ export default function BookingWorkspace({
             fixed
             inset-0
             z-[60]
+
             bg-black/50
             backdrop-blur-sm
           "
@@ -701,13 +656,16 @@ export default function BookingWorkspace({
               bottom-0
               left-0
               right-0
+
               bg-white
+
               rounded-t-[28px]
+
               p-6
+
               space-y-4
+
               shadow-2xl
-              animate-in
-              slide-in-from-bottom
             "
           >
 
@@ -766,7 +724,7 @@ export default function BookingWorkspace({
 
             </div>
 
-            {/* MENU ITEMS */}
+            {/* LINKS */}
 
             <div className="space-y-3 pt-2">
 
@@ -891,32 +849,7 @@ export default function BookingWorkspace({
 
               >
 
-                Combos
-
-              </button>
-
-              <button
-
-                onClick={() =>
-                  scrollToSection(
-                    summaryRef
-                  )
-                }
-
-                className="
-                  w-full
-                  text-left
-                  px-4
-                  py-4
-                  rounded-2xl
-                  bg-[#6A0017]
-                  text-white
-                  font-semibold
-                "
-
-              >
-
-                Pricing Summary
+                Combo Experiences
 
               </button>
 
