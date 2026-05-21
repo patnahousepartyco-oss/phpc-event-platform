@@ -25,49 +25,49 @@ export async function POST(
     const body =
       await request.json();
 
-   const {
+    const {
 
-  /*
-  ======================================
-  CUSTOMER
-  ======================================
-  */
+      /*
+      ======================================
+      CUSTOMER
+      ======================================
+      */
 
-  customerName,
+      customerName,
 
-  customerMobile,
+      customerMobile,
 
-  /*
-  ======================================
-  EVENT
-  ======================================
-  */
+      /*
+      ======================================
+      EVENT
+      ======================================
+      */
 
-  partyType,
+      partyType,
 
-  guestCount,
+      guestCount,
 
-  foodPreference,
+      foodPreference,
 
-  /*
-  ======================================
-  PACKAGE
-  ======================================
-  */
+      /*
+      ======================================
+      PACKAGE
+      ======================================
+      */
 
-  recommendedPackageId,
+      recommendedPackageId,
 
-  recommendedPackageName,
+      recommendedPackageName,
 
-  /*
-  ======================================
-  OPERATIONAL
-  ======================================
-  */
+      /*
+      ======================================
+      OPERATIONAL
+      ======================================
+      */
 
-  selectedBasePlan,
+      selectedBasePlan,
 
-} = body;
+    } = body || {};
 
     /*
     ======================================
@@ -103,109 +103,276 @@ export async function POST(
       );
     }
 
-  /*
-======================================
-APPS SCRIPT REQUEST
-======================================
-*/
+    /*
+    ======================================
+    GOOGLE SCRIPT URL
+    ======================================
+    */
 
-console.log(
-  process.env.GOOGLE_SCRIPT_URL
-);
+    const googleScriptUrl =
 
-const appsScriptResponse =
-  await fetch(
+      process.env
+        .GOOGLE_SCRIPT_URL;
 
-    process.env
-      .GOOGLE_SCRIPT_URL as string,
+    /*
+    ======================================
+    ENV VALIDATION
+    ======================================
+    */
+
+    if (!googleScriptUrl) {
+
+      console.error(
+        "GOOGLE_SCRIPT_URL missing"
+      );
+
+      return NextResponse.json(
+
+        {
+
+          success: false,
+
+          message:
+            "Server configuration missing",
+
+        },
+
+        {
+
+          status: 500,
+
+        }
+
+      );
+    }
+
+    /*
+    ======================================
+    NORMALIZED PAYLOAD
+    ======================================
+    */
+
+    const payload = {
+
+      action:
+        "createLead",
+
+      /*
+      ====================================
+      CUSTOMER
+      ====================================
+      */
+
+      customerName:
+
+        String(
+          customerName || ""
+        ),
+
+      customerMobile:
+
+        String(
+          customerMobile || ""
+        ),
+
+      /*
+      ====================================
+      EVENT
+      ====================================
+      */
+
+      partyType:
+
+        String(
+          partyType || ""
+        ),
+
+      guestCount:
+
+        Number(
+          guestCount || 0
+        ),
+
+      foodPreference:
+
+        String(
+          foodPreference || "Veg"
+        ),
+
+      /*
+      ====================================
+      PACKAGE
+      ====================================
+      */
+
+      recommendedPackageId:
+
+        String(
+          recommendedPackageId || ""
+        ),
+
+      recommendedPackageName:
+
+        String(
+          recommendedPackageName || ""
+        ),
+
+      /*
+      ====================================
+      OPERATIONAL
+      ====================================
+      */
+
+      selectedBasePlan:
+
+        selectedBasePlan !==
+        undefined
+
+          ? Number(
+              selectedBasePlan
+            )
+
+          : null,
+
+    };
+
+    /*
+    ======================================
+    DEBUG
+    ======================================
+    */
+
+    console.log(
+      "CREATE LEAD PAYLOAD:",
+      payload
+    );
+
+    /*
+    ======================================
+    APPS SCRIPT REQUEST
+    ======================================
+    */
+
+    const appsScriptResponse =
+      await fetch(
+
+        googleScriptUrl,
+
+        {
+
+          method: "POST",
+
+          headers: {
+
+            "Content-Type":
+              "application/json",
+
+          },
+
+          body: JSON.stringify(
+            payload
+          ),
+
+        }
+
+      );
+
+    /*
+    ======================================
+    RESPONSE VALIDATION
+    ======================================
+    */
+
+    if (
+      !appsScriptResponse.ok
+    ) {
+
+      console.error(
+
+        "GOOGLE SCRIPT ERROR:",
+
+        appsScriptResponse.status
+      );
+
+      return NextResponse.json(
+
+        {
+
+          success: false,
+
+          message:
+            "Apps Script request failed",
+
+        },
+
+        {
+
+          status: 500,
+
+        }
+
+      );
+    }
+
+    /*
+    ======================================
+    PARSE RESPONSE
+    ======================================
+    */
+
+    const rawText =
+  await appsScriptResponse.text();
+
+let result;
+
+try {
+
+  result =
+    JSON.parse(rawText);
+
+} catch (error) {
+
+  console.error(
+    "INVALID APPS SCRIPT RESPONSE:",
+    rawText
+  );
+
+  return NextResponse.json(
 
     {
 
-      method: "POST",
+      success: false,
 
-      headers: {
+      message:
+        "Invalid Apps Script response",
 
-        "Content-Type":
-          "application/json",
+    },
 
-      },
+    {
 
-      body: JSON.stringify({
-
-        action:
-          "createLead",
-
-        /*
-        ==================================
-        CUSTOMER
-        ==================================
-        */
-
-        customerName,
-
-        customerMobile,
-
-        /*
-        ==================================
-        EVENT
-        ==================================
-        */
-
-        partyType,
-
-        guestCount,
-
-        foodPreference,
-
-        /*
-        ==================================
-        PACKAGE
-        ==================================
-        */
-
-        recommendedPackageId,
-
-        recommendedPackageName,
-
-        /*
-        ==================================
-        OPERATIONAL
-        ==================================
-        */
-
-        selectedBasePlan,
-
-      }),
+      status: 500,
 
     }
 
   );
+}
 
-/*
-======================================
-PARSE RESPONSE
-======================================
-*/
+    /*
+    ======================================
+    RETURN
+    ======================================
+    */
 
-const result =
-  await appsScriptResponse.json();
-
-/*
-======================================
-RETURN
-======================================
-*/
-
-return NextResponse.json(
-  result
-); 
-
-
+    return NextResponse.json(
+      result
+    );
 
   } catch (error) {
 
     console.error(
+
       "CREATE LEAD ERROR:",
+
       error
     );
 
