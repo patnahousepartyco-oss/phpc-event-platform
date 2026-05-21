@@ -874,8 +874,9 @@ export default function Home() {
         }
 
         setSelectedBasePlan={
-          setSelectedBasePlan
-        }
+  (value) =>
+    setSelectedBasePlan(value)
+}
 
         isUserSelected={
   Boolean(selectedPackageId)
